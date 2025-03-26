@@ -5,8 +5,10 @@
   "scripts": {
     "test": "npx tsx src/test.ts",
     "dev": "nodemon src/server.ts",
+    "fast": "cd fastapi && ./venv/bin/python -m uvicorn main:app --port 5001 --reload",
     "updateDb": "npx drizzle-kit push",
-    "db": "npx drizzle-kit studio"
+    "db": "npx drizzle-kit studio",
+    "kill": "sudo ./kill_server.sh"
   },
   "keywords": [],
   "author": "",
