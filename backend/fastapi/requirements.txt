@@ -1,0 +1,7 @@
+selenium
+numpy
+webdriver-manager
+pandas
+fastapi
+pydantic
+uvicorn

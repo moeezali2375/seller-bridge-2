@@ -1,0 +1,9 @@
+@url=http://localhost:5001
+
+###
+POST {{url}}/scrape_amazon
+Content-Type: application/json
+
+{
+	"asins": ["B07QGFD8G6","B0CJ38Y7R4"]
+}
