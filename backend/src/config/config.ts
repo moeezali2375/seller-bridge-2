@@ -14,9 +14,10 @@ function getEnvVariable(key: string, required = true): string {
 
 export const config = {
   PORT: getEnvVariable("PORT"),
-  DB_STRING: getEnvVariable("DB_STRING"),
+  FASTAPI_PORT: getEnvVariable("FASTAPI_PORT"),
+  DATABASE_URL: getEnvVariable("DATABASE_URL"),
   TELEGRAM_API_ID: getEnvVariable("TELEGRAM_API_ID"),
   TELEGRAM_API_HASH: getEnvVariable("TELEGRAM_API_HASH"),
   OPEN_API_KEY: getEnvVariable("OPENAI_API_KEY"),
-  NODE_ENV:getEnvVariable("NODE_ENV")
+  NODE_ENV: getEnvVariable("NODE_ENV"),
 };

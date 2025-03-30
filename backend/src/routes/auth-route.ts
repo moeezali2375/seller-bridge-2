@@ -8,5 +8,5 @@ authRouter.post("/login", (req, res) => {
   res.status(200).json({ msg: "heello" });
 });
 
-authRouter.post("/register/buyer", asyncErrorHandler(registerBuyer));
+authRouter.post("/register/buyer", registerBuyer);
 export default authRouter;

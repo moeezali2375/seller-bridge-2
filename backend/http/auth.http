@@ -2,3 +2,12 @@
 ###
 POST {{URL}}/auth/login
 
+###
+POST http://localhost:6000/api/auth/register/buyer
+Content-Type: application/json
+
+{
+	"name":"Moeez Ali Test",
+	"email":"moeezali2375@icloud.com",
+	"password":"1234"
+}

@@ -6,6 +6,11 @@ import {
   generateExpiryTime,
   generateVerificationToken,
 } from "../utils/verificationToken";
+import { hashPassword } from "../utils/password";
+import CustomError from "../utils/customError";
+// import CustomError from "../utils/customError";
+
+const generateExpiryTimeForEmailVerifications = () => generateExpiryTime(300);
 
 export const findUserByEmail = async (email: string) => {
   const user = await db
@@ -30,26 +35,35 @@ export const getUserVerificationDetails = async (id: number) => {
   return result.length ? result[0] : null;
 };
 
-export const registerBuyer = async (
+export const createBuyer = async (
   name: string,
   email: string,
   password: string,
 ) => {
-  const user = await db.transaction(async (tx) => {
-    const user = await tx
-      .insert(users)
-      .values({ name, email, password })
-      .returning();
+  const hashedPassword = await hashPassword(password);
+  try {
+    const user = await db.transaction(async (tx) => {
+      const newUser = await tx
+        .insert(users)
+        .values({ name: name, email: email, password: hashedPassword })
+        .returning();
 
-    await tx.insert(emailVerifications).values({
-      id: user[0].id,
-      token: generateVerificationToken(),
-      expiresAt: generateExpiryTime(300),
+      await tx.insert(emailVerifications).values({
+        id: newUser[0].id,
+        token: generateVerificationToken(),
+        expiresAt: generateExpiryTimeForEmailVerifications(),
+      });
+
+      await tx.insert(buyers).values({ id: newUser[0].id });
+      return newUser[0];
     });
 
-    await tx.insert(buyers).values({ id: user[0].id });
-    return user[0];
-  });
+    return user;
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
 
-  return user;
+    throw new CustomError("User already exists. 🙁", 400);
+  }
 };

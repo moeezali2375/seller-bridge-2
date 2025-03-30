@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { devErrors, prodErrors } from "../controllers/error-controller";
-import "dotenv/config";
+import CustomError from "../utils/customError";
+import { config } from "../config/config";
+const NODE_ENV = config.NODE_ENV;
 
 const errorMiddleware = (
   error: CustomError,
@@ -8,12 +10,13 @@ const errorMiddleware = (
   res: Response,
   next: NextFunction,
 ) => {
+  console.log("error middleware in use");
   error.statusCode = error.statusCode || 500;
   error.status = error.status || "error";
 
-  if (process.env.NODE_ENV === "development") {
+  if (NODE_ENV === "development") {
     devErrors(res, error);
-  } else if (process.env.NODE_ENV === "production") {
+  } else if (NODE_ENV === "production") {
     prodErrors(res, error);
   }
 };

@@ -1,4 +1,5 @@
 import { Response } from "express";
+import CustomError from "../utils/customError";
 
 export const prodErrors = (res: Response, error: CustomError) => {
   if (error.isOperational) {

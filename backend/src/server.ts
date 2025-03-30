@@ -1,17 +1,29 @@
-import express from "express";
-import "dotenv/config";
-import authRouter from "./routes/auth-route";
-import cors from "cors";
+process.on("uncaughtException", (err) => {
+  console.log("Uncaught Exception");
+  console.log(err.name, err.message);
+  console.log("Uncaught Exception occured! Shutting down...");
+  process.exit(1);
+});
+
 import { config } from "./config/config";
-
-const app = express();
-
-app.use(express.json());
-app.use(cors());
-
-app.use("/api/auth", authRouter);
+import app from "./app";
 
 const PORT = config.PORT;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Server started on PORT: ${PORT}`);
+});
+
+process.on("unhandledRejection", (err: unknown) => {
+  console.log("Unhandled Rejection");
+  if (err instanceof Error) {
+    console.log(err.name, err.message);
+  } else {
+    console.log("Unknown error:", err);
+  }
+
+  console.log("Unhandled rejection occurred! Shutting down...");
+
+  server.close(() => {
+    process.exit(1);
+  });
 });

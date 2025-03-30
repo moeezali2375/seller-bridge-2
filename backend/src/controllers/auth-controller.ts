@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import {
+  createBuyer,
   deleteUserById,
   findUserByEmail,
   getUserVerificationDetails,
@@ -17,20 +18,28 @@ export const registerBuyer = async (
       "📧 email, 📛 name, or 🔑 password not sent!",
       400,
     );
-    next(err);
+    return next(err);
   }
 
   const userExists = await findUserByEmail(email);
 
   if (userExists?.isVerified === true) {
-    next(new CustomError("User already exists. 🙁", 400));
+    return next(new CustomError("User already exists. 🙁", 400));
   } else if (userExists) {
     const userVerification = await getUserVerificationDetails(userExists.id);
     const now = new Date();
-    if (userVerification?.expiresAt > now)
-      next(new CustomError("User already exists. 🙁", 400));
+    if (userVerification && userVerification.expiresAt > now)
+      return next(new CustomError("User already exists. 🙁", 400));
     else {
+      // INFO: If user's verfication time has expired
       await deleteUserById(userExists.id);
     }
   }
+  // TODO: registerBuyer
+  const newUser = await createBuyer(name, email, password);
+  res.status(200).json({
+    status: "ok",
+    message: "User Created Successfully! 🎉✅",
+    user: newUser,
+  });
 };

@@ -1,8 +1,11 @@
 import { NextFunction, Response, Request } from "express";
+import { AsyncRouteHandler } from "../types/handlers";
+import CustomError from "./customError";
 
-const asyncErrorHandler = (func: Function) => {
+const asyncErrorHandler = (func: AsyncRouteHandler) => {
+  console.log("asyncerror");
   return (req: Request, res: Response, next: NextFunction) => {
-    func(req, res, next).catch((err: Error) => next(err));
+    func(req, res, next).catch((err: CustomError) => next(err));
   };
 };
 
