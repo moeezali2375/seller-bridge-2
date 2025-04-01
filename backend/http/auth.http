@@ -1,13 +1,31 @@
-
+@buyerToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTksImlhdCI6MTc0MzUyNTQyOSwiZXhwIjoxNzQzNjExODI5fQ.xe9xF2BrOywospWibylHLq6MdNBRfvWFRjaLCnra_gI
 ###
 POST {{URL}}/auth/login
 
 ###
-POST http://localhost:6000/api/auth/register/buyer
+POST {{URL}}/auth/register/buyer
 Content-Type: application/json
 
 {
-	"name":"Moeez Ali Test",
+	"name":"Moeez Ali Test 3",
+	"email":"moeezali2375@gmail.com",
+	"password":"1234"
+}
+
+###
+GET {{URL}}/auth/buyer/verify-token/484118
+Authorization: Bearer {{buyerToken}}
+
+###
+GET {{URL}}/auth/buyer/regenerate-token
+Authorization: Bearer {{buyerToken}}
+
+
+###
+POST {{URL}}/auth/login
+Content-Type:application/json
+
+{
 	"email":"moeezali2375@icloud.com",
 	"password":"1234"
 }
