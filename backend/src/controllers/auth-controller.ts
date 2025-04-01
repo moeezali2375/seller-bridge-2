@@ -1,45 +1,100 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import {
-  createBuyer,
-  deleteUserById,
-  findUserByEmail,
-  getUserVerificationDetails,
+  createBuyerService,
+  deleteUserByIdService,
+  findUserByEmailService,
+  getUserVerificationDetailsService,
+  loginService,
+  regenerateVerificationTokenService,
+  verifyVerificationTokenService,
 } from "../services/auth-service";
 import CustomError from "../utils/customError";
+import { generateJwtToken } from "../utils/authUtils";
 
-export const registerBuyer = async (
+export const regenerateVerificationTokenController = async (
   req: Request,
   res: Response,
-  next: NextFunction,
 ) => {
+  if (req.user!.isVerified)
+    throw new CustomError("User already verified! 🎉", 400);
+
+  await regenerateVerificationTokenService(req.user!.id);
+
+  // TODO: email
+
+  res.status(200).json({
+    status: "ok",
+    message: "New verification code sent ✅📩",
+  });
+};
+
+export const verifyVerificationTokenController = async (
+  req: Request,
+  res: Response,
+) => {
+  const { verificationToken } = req.params;
+  if (!verificationToken)
+    throw new CustomError("Verification Token not sent! 🙁", 400);
+
+  await verifyVerificationTokenService(req.user!.id, verificationToken);
+
+  //TODO: setup email
+  res
+    .status(200)
+    .json({ status: "ok", message: "Account verified successfully! 🥳" });
+};
+
+export const registerBuyerController = async (req: Request, res: Response) => {
   const { email, name, password } = req.body;
   if (!email || !name || !password) {
-    const err = new CustomError(
-      "📧 email, 📛 name, or 🔑 password not sent!",
-      400,
-    );
-    return next(err);
+    throw new CustomError("📧 email, 📛 name, or 🔑 password not sent!", 400);
   }
 
-  const userExists = await findUserByEmail(email);
+  const userExists = await findUserByEmailService(email);
 
   if (userExists?.isVerified === true) {
-    return next(new CustomError("User already exists. 🙁", 400));
+    throw new CustomError("User already exists. 🙁", 400);
   } else if (userExists) {
-    const userVerification = await getUserVerificationDetails(userExists.id);
+    const userVerification = await getUserVerificationDetailsService(
+      userExists.id,
+    );
     const now = new Date();
     if (userVerification && userVerification.expiresAt > now)
-      return next(new CustomError("User already exists. 🙁", 400));
+      throw new CustomError("User already exists. 🙁", 400);
     else {
       // INFO: If user's verfication time has expired
-      await deleteUserById(userExists.id);
+      await deleteUserByIdService(userExists.id);
     }
   }
-  // TODO: registerBuyer
-  const newUser = await createBuyer(name, email, password);
+
+  const newUser = await createBuyerService(name, email, password);
+  const jwtToken = generateJwtToken(newUser.id);
   res.status(200).json({
     status: "ok",
     message: "User Created Successfully! 🎉✅",
     user: newUser,
+    jwtToken,
+  });
+};
+
+export const loginController = async (req: Request, res: Response) => {
+  const {
+    email,
+    password,
+    rememberMe,
+  }: { email: string; password: string; rememberMe?: boolean } = req.body;
+
+  if (!email || !password)
+    throw new CustomError("Email or password not sent ❌📧🔑", 400);
+
+  const user = await loginService(email, password);
+
+  const jwtToken = generateJwtToken(user!.id, rememberMe);
+
+  res.status(200).json({
+    status: "ok",
+    message: "Login successfull! 🎉✅",
+    user,
+    jwtToken,
   });
 };

@@ -6,9 +6,9 @@ const NODE_ENV = config.NODE_ENV;
 
 const errorMiddleware = (
   error: CustomError,
-  req: Request,
+  _req: Request,
   res: Response,
-  next: NextFunction,
+  _next: NextFunction,
 ) => {
   console.log("error middleware in use");
   error.statusCode = error.statusCode || 500;

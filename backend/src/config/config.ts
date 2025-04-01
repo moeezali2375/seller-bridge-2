@@ -18,6 +18,9 @@ export const config = {
   DATABASE_URL: getEnvVariable("DATABASE_URL"),
   TELEGRAM_API_ID: getEnvVariable("TELEGRAM_API_ID"),
   TELEGRAM_API_HASH: getEnvVariable("TELEGRAM_API_HASH"),
+  JWT_SECRET: getEnvVariable("JWT_SECRET"),
   OPEN_API_KEY: getEnvVariable("OPENAI_API_KEY"),
-  NODE_ENV: getEnvVariable("NODE_ENV"),
+  NODE_ENV: getEnvVariable("NODE_ENV") as "development" | "production",
+  CLIENT_DEV_URL: getEnvVariable("CLIENT_DEV_URL"),
+  CLIENT_PROD_URL: getEnvVariable("CLIENT_PROD_URL"),
 };

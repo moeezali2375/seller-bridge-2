@@ -7,7 +7,7 @@ export const buyers = pgTable("buyers", {
     .references(() => users.id, { onDelete: "cascade" }),
   stripeCustomerId: text("stripe_customer_id").unique(),
   stripeSubscriptionId: text("stripe_subscription_id").unique(),
-  subscriptionStatus: text("subscription_status").default("inactive"),
+  subscriptionStatus: text("subscription_status").notNull().default("inactive"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at")
     .defaultNow()

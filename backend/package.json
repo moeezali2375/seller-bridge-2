@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "npx tsx src/test.ts",
-    "dev": "nodemon src/server.ts",
+    "dev": "nodemon --exec tsx src/server.ts",
     "fast": "cd fastapi && ./venv/bin/python -m uvicorn main:app --port 5001 --reload",
     "updateDb": "npx drizzle-kit push",
     "db": "npx drizzle-kit studio",
@@ -20,6 +20,7 @@
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.40.1",
     "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
     "pg": "^8.14.1"
   },
   "devDependencies": {
@@ -27,6 +28,7 @@
     "@types/bcrypt": "^5.0.2",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^22.13.10",
     "@types/pg": "^8.11.11",
     "drizzle-kit": "^0.30.6",
