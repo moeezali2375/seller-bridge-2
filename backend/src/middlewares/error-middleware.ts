@@ -10,7 +10,6 @@ const errorMiddleware = (
   res: Response,
   _next: NextFunction,
 ) => {
-  console.log("error middleware in use");
   error.statusCode = error.statusCode || 500;
   error.status = error.status || "error";
 

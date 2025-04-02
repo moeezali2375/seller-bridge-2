@@ -10,6 +10,7 @@ import {
 } from "../services/auth-service";
 import CustomError from "../utils/customError";
 import { generateJwtToken } from "../utils/authUtils";
+import { sendVerificationEmail } from "../services/email-service";
 
 export const regenerateVerificationTokenController = async (
   req: Request,
@@ -18,9 +19,12 @@ export const regenerateVerificationTokenController = async (
   if (req.user!.isVerified)
     throw new CustomError("User already verified! 🎉", 400);
 
-  await regenerateVerificationTokenService(req.user!.id);
+  const newVerificationToken = await regenerateVerificationTokenService(
+    req.user!.id,
+  );
 
-  // TODO: email
+  // NOTE: no need to wait
+  sendVerificationEmail(req.user!.email, req.user!.name, newVerificationToken);
 
   res.status(200).json({
     status: "ok",
@@ -67,12 +71,20 @@ export const registerBuyerController = async (req: Request, res: Response) => {
     }
   }
 
-  const newUser = await createBuyerService(name, email, password);
-  const jwtToken = generateJwtToken(newUser.id);
+  const { user, verificationToken } = await createBuyerService(
+    name,
+    email,
+    password,
+  );
+
+  const jwtToken = generateJwtToken(user.id);
+
+  // NOTE: no need to wait
+  sendVerificationEmail(user.email, user.name, verificationToken);
   res.status(200).json({
     status: "ok",
     message: "User Created Successfully! 🎉✅",
-    user: newUser,
+    user,
     jwtToken,
   });
 };

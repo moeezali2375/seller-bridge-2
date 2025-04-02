@@ -23,4 +23,11 @@ export const config = {
   NODE_ENV: getEnvVariable("NODE_ENV") as "development" | "production",
   CLIENT_DEV_URL: getEnvVariable("CLIENT_DEV_URL"),
   CLIENT_PROD_URL: getEnvVariable("CLIENT_PROD_URL"),
+  EMAIL_ENABLED: getEnvVariable("EMAIL_ENABLED"),
+  SMTP_HOST: getEnvVariable("SMTP_HOST", false),
+  SMTP_PORT: getEnvVariable("SMTP_PORT", false),
+  SMTP_SECURE: getEnvVariable("SMTP_SECURE", false),
+  SMTP_USER: getEnvVariable("SMTP_USER"),
+  SMTP_PASS: getEnvVariable("SMTP_PASS"),
+  SMTP_FROM: getEnvVariable("SMTP_FROM", false),
 };

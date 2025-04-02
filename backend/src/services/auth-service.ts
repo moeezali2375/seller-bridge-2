@@ -61,23 +61,39 @@ export const createBuyerService = async (
 ) => {
   const hashedPassword = await hashPassword(password);
   try {
-    const user = await db.transaction(async (tx) => {
+    const { user, verificationToken } = await db.transaction(async (tx) => {
       const newUser = await tx
         .insert(users)
         .values({ name: name, email: email, password: hashedPassword })
         .returning();
 
-      await tx.insert(emailVerifications).values({
-        id: newUser[0].id,
-        verificationToken: generateVerificationToken(),
-        expiresAt: generateExpiryTimeForEmailVerifications(),
-      });
+      if (!newUser || newUser.length === 0) throw new CustomError("", 400);
 
-      await tx.insert(buyers).values({ id: newUser[0].id });
-      return newUser[0];
+      const newEmailVerification = await tx
+        .insert(emailVerifications)
+        .values({
+          id: newUser[0].id,
+          verificationToken: generateVerificationToken(),
+          expiresAt: generateExpiryTimeForEmailVerifications(),
+        })
+        .returning();
+
+      if (!newEmailVerification || newEmailVerification.length == 0)
+        throw new CustomError("", 400);
+
+      const newBuyer = await tx
+        .insert(buyers)
+        .values({ id: newUser[0].id })
+        .returning();
+      if (!newBuyer || newBuyer.length === 0) throw new CustomError("", 400);
+
+      return {
+        user: newUser[0],
+        verificationToken: newEmailVerification[0].verificationToken,
+      };
     });
 
-    return user;
+    return { user, verificationToken };
   } catch (error: unknown) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -152,6 +168,7 @@ export const regenerateVerificationTokenService = async (userId: number) => {
     .returning();
   if (!updatedEmailVerification || updatedEmailVerification.length == 0)
     throw new CustomError("User already verified or does not exist ✅❌", 400);
+  return updatedEmailVerification[0].verificationToken;
 };
 
 export const loginService = async (
