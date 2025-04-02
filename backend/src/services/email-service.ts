@@ -77,6 +77,7 @@ export async function sendVerificationEmail(
   to: string,
   username: string,
   verificationCode: string,
+  expiryTime: string,
 ): Promise<void> {
   const templatePath = path.join(
     __dirname,
@@ -89,7 +90,7 @@ export async function sendVerificationEmail(
   const context = {
     username,
     verificationCode,
-    subject: "Verify Your Email",
+    expiryTime,
   };
 
   await sendEmail(to, "Verify Your Email", templatePath, context);

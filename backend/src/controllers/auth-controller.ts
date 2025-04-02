@@ -29,7 +29,12 @@ export const regenerateVerificationTokenController = async (
   );
 
   // NOTE: no need to wait
-  sendVerificationEmail(req.user!.email, req.user!.name, newVerificationToken);
+  sendVerificationEmail(
+    req.user!.email,
+    req.user!.name,
+    newVerificationToken,
+    "5",
+  );
 
   res.status(200).json({
     status: "ok",
@@ -85,7 +90,7 @@ export const registerBuyerController = async (req: Request, res: Response) => {
   const jwtToken = generateJwtToken(user.id);
 
   // NOTE: no need to wait
-  sendVerificationEmail(user.email, user.name, verificationToken);
+  sendVerificationEmail(user.email, user.name, verificationToken, "5");
   res.status(200).json({
     status: "ok",
     message: "User Created Successfully! 🎉✅",

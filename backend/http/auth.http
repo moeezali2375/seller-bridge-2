@@ -1,4 +1,4 @@
-@buyerToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NjEsImlhdCI6MTc0MzU5OTAxMCwiZXhwIjoxNzQzNjg1NDEwfQ.URU24RJzB6XoamQ4F7Ie_bbJdofRX4KferrLONKez5Y
+@buyerToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NjIsImlhdCI6MTc0MzYyMzk0NiwiZXhwIjoxNzQzNzEwMzQ2fQ.NG9RdcIYnj0i2Tql8Xc9WMQoXRtL7MpOhI4bGtcfjpI
 ###
 POST {{URL}}/auth/login
 
@@ -13,7 +13,7 @@ Content-Type: application/json
 }
 
 ###
-GET {{URL}}/auth/buyer/verify-token/833763
+GET {{URL}}/auth/buyer/verify-token/106304
 Authorization: Bearer {{buyerToken}}
 
 ###
