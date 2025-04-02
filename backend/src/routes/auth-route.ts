@@ -1,9 +1,11 @@
 import express from "express";
 import asyncErrorHandler from "../utils/asyncErrorHandler";
 import {
+  initiateResetPasswordController,
   loginController,
   regenerateVerificationTokenController,
   registerBuyerController,
+  resetPasswordController,
   verifyVerificationTokenController,
 } from "../controllers/auth-controller";
 import { protectBuyer } from "../middlewares/auth-middleware";
@@ -35,5 +37,12 @@ authRouter.get(
 // authRouter.get("/seller/regenerate-token", protectSeller);
 
 authRouter.post("/login", asyncErrorHandler(loginController));
+
+authRouter.put(
+  "/reset-password",
+  asyncErrorHandler(initiateResetPasswordController),
+);
+
+authRouter.post("/reset-password", asyncErrorHandler(resetPasswordController));
 
 export default authRouter;

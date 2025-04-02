@@ -4,6 +4,12 @@ import { config } from "../config/config";
 import CustomError from "./customError";
 import crypto from "crypto";
 
+export const generateExpiryTimeForEmailVerifications = () =>
+  generateExpiryTime(300);
+
+export const generateResetPasswordToken = () =>
+  crypto.randomBytes(64).toString("hex");
+
 export const generateVerificationToken = () =>
   crypto.randomInt(100000, 999999).toString();
 

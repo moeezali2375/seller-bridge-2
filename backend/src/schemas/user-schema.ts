@@ -33,3 +33,18 @@ export const emailVerifications = pgTable("email_verifications", {
     .defaultNow()
     .$onUpdate(() => new Date()),
 });
+
+export const resetPasswordVerifications = pgTable(
+  "reset_password_verifications",
+  {
+    id: serial("id")
+      .primaryKey()
+      .references(() => users.id, { onDelete: "cascade" }),
+    verificationToken: text("verification_token").notNull(),
+    expiresAt: timestamp("expires_at").notNull(),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+);

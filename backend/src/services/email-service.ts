@@ -94,3 +94,35 @@ export async function sendVerificationEmail(
 
   await sendEmail(to, "Verify Your Email", templatePath, context);
 }
+
+export async function sendResetPasswordVerificationEmail(
+  to: string,
+  username: string,
+  resetPasswordVerificationToken: string,
+  expiryTime: string,
+) {
+  const templatePath = path.join(
+    __dirname,
+    "..",
+    "..",
+    "templates",
+    "resetPasswordVerificationEmail.hbs",
+  );
+
+  let resetPasswordLink = "";
+
+  if (config.NODE_ENV === "development") {
+    resetPasswordLink = `${config.CLIENT_DEV_URL}/reset-password/${to}/${resetPasswordVerificationToken}`;
+  } else {
+    resetPasswordLink = `${config.CLIENT_PROD_URL}/reset-password/${to}/${resetPasswordVerificationToken}`;
+  }
+
+  const context = {
+    username,
+    resetPasswordVerificationToken,
+    expiryTime,
+    resetPasswordLink,
+  };
+
+  await sendEmail(to, "Reset Your Password", templatePath, context);
+}

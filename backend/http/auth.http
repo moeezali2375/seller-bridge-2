@@ -26,6 +26,24 @@ POST {{URL}}/auth/login
 Content-Type:application/json
 
 {
-	"email":"moeezali2375@icloud.com",
-	"password":"1234"
+	"email":"moeezali2375@gmail.com",
+	"password":"12345"
+}
+
+###
+PUT {{URL}}/auth/reset-password
+Content-Type: application/json
+
+{
+	"email":"moeezali2375@gmail.com"
+}
+
+###
+POST {{URL}}/auth/reset-password
+Content-Type: application/json
+
+{
+	"email":"moeezali2375@gmail.com",
+	"verificationToken":"0133ec4f09b7638f881de036d38786222299483f5b2baba9e947da1bdbb111649bbee0c157894db5899e63b436ba293403edf69a65eb65f4b1c6c1e34929e9e5",
+	"newPassword":"1234"
 }

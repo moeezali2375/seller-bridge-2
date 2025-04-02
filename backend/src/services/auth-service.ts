@@ -1,17 +1,84 @@
 import { and, eq, gt, lte } from "drizzle-orm";
 import db from "../config/db";
 import { buyers } from "../schemas/buyer-schema";
-import { emailVerifications, users } from "../schemas/user-schema";
+import {
+  emailVerifications,
+  resetPasswordVerifications,
+  users,
+} from "../schemas/user-schema";
 import CustomError from "../utils/customError";
 import {
-  generateExpiryTime,
+  generateExpiryTimeForEmailVerifications,
   generateVerificationToken,
   comparePasswords,
   hashPassword,
+  generateResetPasswordToken,
 } from "../utils/authUtils";
 import { userBuyer, userSeller } from "../types/auth";
 
-const generateExpiryTimeForEmailVerifications = () => generateExpiryTime(300);
+export const deleteResetPasswordService = async (userId: number) => {
+  const deletedData = await db
+    .delete(resetPasswordVerifications)
+    .where(eq(resetPasswordVerifications.id, userId))
+    .returning();
+  return deletedData.length > 0 ? true : false;
+};
+
+export const initiateResetPasswordService = async (userId: number) => {
+  await deleteResetPasswordService(userId);
+
+  const resetPasswordVerification = await db
+    .insert(resetPasswordVerifications)
+    .values({
+      id: userId,
+      verificationToken: generateResetPasswordToken(),
+      expiresAt: generateExpiryTimeForEmailVerifications(),
+    })
+    .returning();
+  if (!resetPasswordVerification || resetPasswordVerification.length === 0)
+    throw new CustomError(
+      "Error initiating password recovery request! 🤨",
+      400,
+    );
+  return resetPasswordVerification[0];
+};
+
+export const resetPasswordService = async (
+  email: string,
+  verificationToken: string,
+  newPassword: string,
+) => {
+  await db.transaction(async (tx) => {
+    const user = await findUserByEmailService(email);
+    if (!user) throw new CustomError("Invalid link! 🤧", 400);
+
+    const resetPasswordVerification = await tx
+      .select()
+      .from(resetPasswordVerifications)
+      .where(
+        and(
+          eq(resetPasswordVerifications.id, user.id),
+          eq(resetPasswordVerifications.verificationToken, verificationToken),
+          gt(resetPasswordVerifications.expiresAt, new Date()),
+        ),
+      );
+
+    if (!resetPasswordVerification || resetPasswordVerification.length === 0)
+      throw new CustomError("Invalid link or time expired! 🤧", 400);
+
+    const updatedUser = await tx
+      .update(users)
+      .set({ password: await hashPassword(newPassword) })
+      .where(eq(users.id, user.id))
+      .returning();
+
+    if (!updatedUser || updatedUser.length === 0)
+      throw new CustomError("Error updating password! 🤧", 400);
+
+    if (!(await deleteResetPasswordService(user.id)))
+      throw new CustomError("Error updating password! 🤧", 400);
+  });
+};
 
 export const getBuyerByIdService = async (userId: number) => {
   const buyer = await db

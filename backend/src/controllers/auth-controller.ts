@@ -1,16 +1,21 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import {
   createBuyerService,
   deleteUserByIdService,
   findUserByEmailService,
   getUserVerificationDetailsService,
+  initiateResetPasswordService,
   loginService,
   regenerateVerificationTokenService,
+  resetPasswordService,
   verifyVerificationTokenService,
 } from "../services/auth-service";
 import CustomError from "../utils/customError";
 import { generateJwtToken } from "../utils/authUtils";
-import { sendVerificationEmail } from "../services/email-service";
+import {
+  sendResetPasswordVerificationEmail,
+  sendVerificationEmail,
+} from "../services/email-service";
 
 export const regenerateVerificationTokenController = async (
   req: Request,
@@ -109,4 +114,42 @@ export const loginController = async (req: Request, res: Response) => {
     user,
     jwtToken,
   });
+};
+
+export const initiateResetPasswordController = async (
+  req: Request,
+  res: Response,
+  _next: NextFunction,
+) => {
+  const { email } = req.body;
+
+  const user = await findUserByEmailService(email);
+
+  if (!user)
+    throw new CustomError("User does not exist in the database. 😛", 400);
+
+  const resetPasswordVerification = await initiateResetPasswordService(user.id);
+
+  sendResetPasswordVerificationEmail(
+    email,
+    user.name,
+    resetPasswordVerification.verificationToken,
+    "5",
+  );
+
+  res
+    .status(200)
+    .json({ status: "ok", message: "Password recovery request initiated! 🤨" });
+};
+
+export const resetPasswordController = async (
+  req: Request,
+  res: Response,
+  _next: NextFunction,
+) => {
+  const { email, verificationToken, newPassword } = req.body;
+
+  await resetPasswordService(email, verificationToken, newPassword);
+
+  res.status(200).json({ status: "ok", message: "Password recovered! 😎" });
 };
